@@ -4,9 +4,11 @@ import 'package:hepitrack/screens/profile.dart';
 import 'package:hepitrack/screens/track.dart';
 import 'package:hepitrack/services/firebase_remote_config.dart';
 import 'package:hepitrack/services/news_service.dart';
+import 'package:hepitrack/services/storage_service.dart';
 import 'package:hepitrack/widgets/error_display.dart';
 import 'package:hepitrack/widgets/loader_display.dart';
 import 'package:hepitrack/widgets/news_swiper.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -19,10 +21,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<Response> _newsList;
+  Future<dynamic> _trackData;
 
   @override
   void initState() {
     _newsList = getNews();
+    _trackData = StorageService().readTrackData();
     super.initState();
   }
 
@@ -48,6 +52,26 @@ class _HomePageState extends State<HomePage> {
         }
       },
       future: _newsList,
+    );
+  }
+
+  Widget trackDataBuilder() {
+    return FutureBuilder<dynamic>(
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return ErrorDisplay();
+        } else if (snapshot.hasData && snapshot.data.length > 0) {
+          return Text(snapshot.data[0].toString());
+        } else if (snapshot.data == null) {
+          return SizedBox(
+            height: 250,
+            child: LoaderDisplay(),
+          );
+        } else {
+          return Container();
+        }
+      },
+      future: _trackData,
     );
   }
 
@@ -77,6 +101,20 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               newsListBuilder(),
+              trackDataBuilder(),
+              // charts.BarChart(
+              //   [
+              //     new charts.Series<int, String>(
+              //       id: 'Sales',
+              //       colorFn: (_, __) =>
+              //           charts.MaterialPalette.blue.shadeDefault,
+              //       domainFn: (int sales, _) => sales.toString(),
+              //       measureFn: (int sales, _) => sales,
+              //       data: [1, 2],
+              //     )
+              //   ],
+              //   animate: true,
+              // ),
             ],
           ),
         ),

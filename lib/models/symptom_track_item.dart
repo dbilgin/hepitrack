@@ -10,4 +10,22 @@ class SymptomTrackItem {
         intensity: intensity,
         bodyParts: bodyParts,
       );
+
+  SymptomTrackItem.fromJson(Map<String, dynamic> json)
+      : symptom = json['symptom'],
+        bodyParts = json['bodyParts']
+                ?.toString()
+                ?.split(',')
+                ?.map((data) => int.parse(data))
+                ?.toList() ??
+            [],
+        intensity = json['intensity'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'symptom': symptom,
+      'body_parts': bodyParts.join(','),
+      'intensity': intensity,
+    };
+  }
 }

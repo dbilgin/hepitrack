@@ -1,8 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class StorageService {
   final storage = new FlutterSecureStorage();
+
+  Future<void> addTrackData(String trackData) async {
+    var currentData = await storage.read(key: 'track');
+    var separator = '';
+    if (currentData != null && currentData.length > 0) {
+      separator = ',';
+    }
+
+    var dataToWrite = (currentData ?? '') + separator + json.encode(trackData);
+    await storage.write(key: 'track', value: dataToWrite);
+  }
+
+  Future<dynamic> readTrackData() async {
+    var currentData = '[' + ((await storage.read(key: 'track')) ?? '') + ']';
+    return jsonDecode(currentData);
+  }
 
   Future<bool> isAuthenticated() async {
     return await readAuthToken() != null;
@@ -15,6 +33,10 @@ class StorageService {
 
   Future<void> writeAuthToken(String value) async {
     await storage.write(key: 'auth_token', value: value);
+  }
+
+  Future<void> deleteAuthToken() async {
+    await storage.delete(key: 'auth_token');
   }
 
   Future<String> readAuthToken() async {

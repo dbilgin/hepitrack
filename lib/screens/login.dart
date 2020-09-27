@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hepitrack/services/auth_service.dart';
 import 'package:hepitrack/services/storage_service.dart';
+import 'package:hepitrack/services/user_service.dart';
 import 'package:hepitrack/utils/common.dart';
 import 'package:hepitrack/utils/dialogs.dart';
 
@@ -82,16 +83,28 @@ class LoginPage extends StatelessWidget {
                     await StorageService().writeVerified(
                       loginResult.data['verified'].toString(),
                     );
-                    Dialogs.showCustomDialog(
-                      context: context,
-                      title: 'Login Successful',
-                      message:
-                          'You are now logged in, your data will be backed up at all times.',
-                      onPressed: () {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                      },
-                    );
+
+                    var trackData = await UserService().getAllTracks();
+
+                    if (trackData.statusCode == 200) {
+                      for (var track in trackData.data) {
+                        var stringifiedTrack = track.toString();
+                        await StorageService().addTrackData(stringifiedTrack);
+                      }
+
+                      Dialogs.showCustomDialog(
+                        context: context,
+                        title: 'Login Successful',
+                        message:
+                            'You are now logged in, your data will be backed up at all times.',
+                        onPressed: () {
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
+                        },
+                      );
+                    } else {
+                      Dialogs.showCustomDialog(context: context);
+                    }
                   } else if (loginResult.statusCode == 400) {
                     Dialogs.showCustomDialog(
                       context: context,

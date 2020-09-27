@@ -30,4 +30,26 @@ class UserService {
       return error.response;
     }
   }
+
+  Future<Response> addTrack(Map<String, Object> trackData) async {
+    try {
+      var dio = API.getDio();
+      Response response = await dio.post('track/save', data: trackData);
+
+      return response;
+    } on DioError catch (error) {
+      return error.response;
+    }
+  }
+
+  Future<Response> getAllTracks() async {
+    try {
+      var dio = API.getDio();
+      Response response = await dio.get('track/all');
+
+      return response;
+    } on DioError catch (error) {
+      return error.response;
+    }
+  }
 }

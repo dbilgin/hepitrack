@@ -30,8 +30,9 @@ class _HepiTrackState extends State<HepiTrack> {
   _getUserData() async {
     var storageColor = await StorageService().readUserColor();
 
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult != ConnectivityResult.none) {
+    var isAuthenticated = await StorageService().isAuthenticated();
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult != ConnectivityResult.none && isAuthenticated) {
       Response _userData = await UserService().data();
       if (_userData.statusCode == 200) {
         var dataResult = _userData.data;
@@ -50,6 +51,7 @@ class _HepiTrackState extends State<HepiTrack> {
           await StorageService().writeVerified(resultVerified.toString());
         }
       } else {
+        await StorageService().deleteAuthToken();
         setState(() {
           _readUserColor =
               _setColor(storageColor.value.toString(), storageColor);

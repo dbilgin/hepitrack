@@ -12,4 +12,15 @@ class FoodTrackItem {
         description: description,
         image: image,
       );
+
+  FoodTrackItem.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        description = json['description'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+    };
+  }
 }
