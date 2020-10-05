@@ -14,8 +14,9 @@ class NewsSwiper extends StatefulWidget {
 class _NewsSwiperState extends State<NewsSwiper> {
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-      fit: FlexFit.tight,
+    return SizedBox(
+      height: 350,
+      width: double.infinity,
       child: Column(
         children: <Widget>[
           Text('Health News'),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hepitrack/services/auth_service.dart';
 import 'package:hepitrack/services/storage_service.dart';
@@ -88,7 +90,7 @@ class LoginPage extends StatelessWidget {
 
                     if (trackData.statusCode == 200) {
                       for (var track in trackData.data) {
-                        var stringifiedTrack = track.toString();
+                        var stringifiedTrack = jsonEncode(track);
                         await StorageService().addTrackData(stringifiedTrack);
                       }
 

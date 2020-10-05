@@ -17,7 +17,7 @@ class StorageService {
     await storage.write(key: 'track', value: dataToWrite);
   }
 
-  Future<dynamic> readTrackData() async {
+  Future<List<dynamic>> readTrackData() async {
     var currentData = '[' + ((await storage.read(key: 'track')) ?? '') + ']';
     return jsonDecode(currentData);
   }

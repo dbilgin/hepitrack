@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -169,7 +171,7 @@ class _TrackPageState extends State<TrackPage> {
 
                         Navigator.pop(context);
                         if (trackResult.statusCode == 204) {
-                          var stringifiedTrack = trackData.toString();
+                          var stringifiedTrack = jsonEncode(trackData);
                           await StorageService().addTrackData(stringifiedTrack);
                           Navigator.pop(context);
                         } else {
