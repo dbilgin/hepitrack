@@ -1,6 +1,6 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:dynamic_themes/dynamic_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:hepitrack/services/user_service.dart';
@@ -8,6 +8,28 @@ import 'package:hepitrack/utils/common.dart';
 
 import 'screens/homepage.dart';
 import 'services/storage_service.dart';
+import 'utils/hex_color.dart';
+
+class AppThemes {
+  static const int Light = 0;
+  static const int Dark = 1;
+}
+
+final themeCollection = (Color appBarColor) {
+  return ThemeCollection(
+    themes: {
+      AppThemes.Light: Common.getThemeData(
+        brightness: Brightness.light,
+        appBarColor: appBarColor,
+      ),
+      AppThemes.Dark: Common.getThemeData(
+        brightness: Brightness.dark,
+        appBarColor: appBarColor,
+      ),
+    },
+    fallbackTheme: ThemeData.light(),
+  );
+};
 
 void main() {
   runApp(HepiTrack());
@@ -37,9 +59,9 @@ class _HepiTrackState extends State<HepiTrack> {
       if (_userData.statusCode == 200) {
         var dataResult = _userData.data;
 
+        var col = _setColor(dataResult['color']?.toString(), storageColor);
         setState(() {
-          _readUserColor =
-              _setColor(dataResult['color']?.toString(), storageColor);
+          _readUserColor = col;
         });
 
         var resultEmail = dataResult['email'];
@@ -65,9 +87,8 @@ class _HepiTrackState extends State<HepiTrack> {
   }
 
   Future<Color> _setColor(String colorResult, Color storageColor) async {
-    var serverColor = colorResult == null
-        ? Colors.transparent
-        : Color(int.parse(colorResult));
+    var serverColor =
+        colorResult == null ? Colors.transparent : HexColor(colorResult);
 
     if (serverColor != storageColor) {
       await StorageService().writeUserColor(serverColor);
@@ -79,10 +100,10 @@ class _HepiTrackState extends State<HepiTrack> {
 
   _getApp({Color appBarColor}) {
     return new DynamicTheme(
-      defaultBrightness: Brightness.light,
-      data: (brightness) =>
-          Common.getThemeData(brightness: brightness, appBarColor: appBarColor),
-      themedWidgetBuilder: (context, theme) {
+      key: Key(appBarColor.toString()),
+      themeCollection: themeCollection(appBarColor),
+      defaultThemeId: 0,
+      builder: (context, theme) {
         return new MaterialApp(
           title: 'HepiTrack',
           theme: theme,

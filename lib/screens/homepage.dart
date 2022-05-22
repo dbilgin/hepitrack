@@ -7,7 +7,6 @@ import 'package:hepitrack/models/symptom.dart';
 import 'package:hepitrack/models/water_chart_track.dart';
 import 'package:hepitrack/screens/profile.dart';
 import 'package:hepitrack/screens/track.dart';
-import 'package:hepitrack/services/firebase_remote_config.dart';
 import 'package:hepitrack/services/news_service.dart';
 import 'package:hepitrack/services/storage_service.dart';
 import 'package:hepitrack/utils/db.dart';
@@ -16,6 +15,8 @@ import 'package:hepitrack/widgets/loader_display.dart';
 import 'package:hepitrack/widgets/news_swiper.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
+
+import '../services/firebase_remote_config.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -193,7 +194,7 @@ class _HomePageState extends State<HomePage> {
 
       if (i + 1 != mappedList.length) {
         widgets.add(Container(
-          color: Theme.of(context).buttonColor,
+          color: Theme.of(context).hoverColor,
           height: 1,
           margin: EdgeInsets.all(8.0),
         ));
@@ -201,7 +202,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     widgets.add(Container(
-      color: Theme.of(context).accentColor,
+      color: Theme.of(context).colorScheme.secondary,
       height: 1,
       margin: EdgeInsets.only(top: 8.0),
     ));
@@ -238,7 +239,7 @@ class _HomePageState extends State<HomePage> {
 
         if (i + 1 != savedFoodList.length) {
           widgets.add(Container(
-            color: Theme.of(context).buttonColor,
+            color: Theme.of(context).hoverColor,
             height: 1,
             margin: EdgeInsets.all(8.0),
           ));
@@ -246,7 +247,7 @@ class _HomePageState extends State<HomePage> {
       }
 
       widgets.add(Container(
-        color: Theme.of(context).accentColor,
+        color: Theme.of(context).colorScheme.secondary,
         height: 1,
         margin: EdgeInsets.only(top: 8.0),
       ));
@@ -294,7 +295,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               }).toList());
-        } else if (snapshot.data[0] == null) {
+        } else if (snapshot.data != null && snapshot.data[0] == null) {
           return SizedBox(
             height: 250,
             child: LoaderDisplay(),

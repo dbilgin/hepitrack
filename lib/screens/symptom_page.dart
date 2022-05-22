@@ -1,5 +1,6 @@
-import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:dynamic_themes/dynamic_themes.dart';
 import 'package:flutter/material.dart';
+import 'package:hepitrack/main.dart';
 import 'package:hepitrack/models/body_part.dart';
 import 'package:hepitrack/models/symptom.dart';
 import 'package:hepitrack/models/symptom_track_item.dart';
@@ -132,7 +133,7 @@ class _SymptomPageState extends State<SymptomPage>
             },
             decoration: InputDecoration(
               filled: true,
-              fillColor: DynamicTheme.of(context).brightness == Brightness.light
+              fillColor: DynamicTheme.of(context).themeId == AppThemes.Light
                   ? Colors.grey[200]
                   : Theme.of(context).scaffoldBackgroundColor,
               hintText: 'Select a symptom',
@@ -169,13 +170,13 @@ class _SymptomPageState extends State<SymptomPage>
                 _symptomTrackItem.bodyParts = parts;
               });
             },
-            value: _symptomTrackItem.bodyParts,
+            initialValue: _symptomTrackItem.bodyParts,
             textField: 'display',
             valueField: 'value',
-            hintText: 'Pick the affected body parts',
+            hintWidget: Text('Pick the affected body parts'),
             okButtonLabel: 'OK',
             cancelButtonLabel: 'CANCEL',
-            titleText: 'Body Part',
+            title: Text('Body Part'),
           );
         } else {
           return LoaderDisplay();

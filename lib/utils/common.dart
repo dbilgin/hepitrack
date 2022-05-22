@@ -29,7 +29,7 @@ class Common {
       brightness: brightness,
       scaffoldBackgroundColor:
           brightness == Brightness.light ? Colors.white : null,
-      buttonColor: mainColor,
+      hoverColor: mainColor,
       buttonTheme: ButtonThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(0.0),
@@ -48,7 +48,7 @@ class Common {
       backgroundColor: Colors.blue,
       primaryColor: mainColor,
       primarySwatch: mainColor,
-      accentColor: Colors.blueAccent,
+      focusColor: Colors.blueAccent,
       primaryTextTheme: TextTheme(
         headline6: TextStyle(color: mainColor),
       ),

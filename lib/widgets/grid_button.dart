@@ -19,7 +19,7 @@ class GridButton extends StatelessWidget {
     return RaisedButton(
       onPressed: buttonCallback,
       color: isFilled
-          ? Theme.of(context).accentColor
+          ? Theme.of(context).focusColor
           : Theme.of(context).primaryColor,
       padding: EdgeInsets.zero,
       child: Stack(
@@ -30,7 +30,7 @@ class GridButton extends StatelessWidget {
               right: 0,
               child: Icon(
                 Icons.turned_in,
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).focusColor,
               ),
             ),
           Container(

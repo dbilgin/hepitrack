@@ -4,7 +4,7 @@ import 'package:hepitrack/services/storage_service.dart';
 class API {
   static Dio getDio({isGeneric = false}) {
     var _dio = Dio();
-    _dio.options.baseUrl = 'https://api.hepitrack.com/';
+    _dio.options.baseUrl = 'https://hepitrack.omedacore.com/';
     // _dio.options.baseUrl = 'http://10.0.2.2:5000/';
 
     _dio.interceptors

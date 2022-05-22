@@ -1,9 +1,11 @@
 import 'dart:io';
 
-import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:dynamic_themes/dynamic_themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:hepitrack/main.dart';
 import 'package:hepitrack/models/auth_status.dart';
 import 'package:hepitrack/screens/register.dart';
 import 'package:hepitrack/services/auth_service.dart';
@@ -32,7 +34,9 @@ class _ProfilePageState extends State<ProfilePage> {
   ScrollController _scrollController;
   final String _platform = Platform.isAndroid
       ? 'Android'
-      : Platform.isIOS ? 'iOS' : Platform.operatingSystem;
+      : Platform.isIOS
+          ? 'iOS'
+          : Platform.operatingSystem;
 
   AuthLocalStatus _isAuthenticated = AuthLocalStatus.none;
   Future<String> _email;
@@ -62,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _setUserColor() {
-    Color currentColor = DynamicTheme.of(context).data.appBarTheme.color;
+    Color currentColor = Theme.of(context).appBarTheme.backgroundColor;
     setState(() {
       _barColor = currentColor.alpha == 0 ? Colors.white : currentColor;
     });
@@ -81,69 +85,63 @@ class _ProfilePageState extends State<ProfilePage> {
     Color previousColor = _barColor;
     showDialog(
       context: context,
-      child: AlertDialog(
-        title: const Text('Pick a color!'),
-        content: SingleChildScrollView(
-          child: ColorPicker(
-            pickerColor: _barColor,
-            onColorChanged: (value) => setState(() {
-              _barColor = value;
-            }),
-            showLabel: true,
-            pickerAreaHeightPercent: 0.5,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Pick a color!'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: _barColor,
+              onColorChanged: (value) => setState(() {
+                _barColor = value;
+              }),
+              showLabel: true,
+              pickerAreaHeightPercent: 0.5,
+            ),
           ),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: const Text('Reset'),
-            onPressed: () async {
-              var colorResponse = await UserService().updateColor(null);
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Reset'),
+              onPressed: () async {
+                var colorResponse = await UserService().updateColor(null);
 
-              if (colorResponse.statusCode == 204) {
-                StorageService().deleteUserColor();
+                if (colorResponse.statusCode == 204) {
+                  StorageService().deleteUserColor();
 
-                var currentBrightness = DynamicTheme.of(context).brightness;
-                DynamicTheme.of(context).setThemeData(
-                    Common.getThemeData(brightness: currentBrightness));
-                setState(() {
-                  _barColor = Colors.white;
-                });
+                  setState(() {
+                    _barColor = Colors.white;
+                  });
 
+                  Phoenix.rebirth(context);
+                } else {
+                  Dialogs.showCustomDialog(context: context);
+                }
+              },
+            ),
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                setState(() => _barColor = previousColor);
                 Navigator.of(context).pop();
-              } else {
-                Dialogs.showCustomDialog(context: context);
-              }
-            },
-          ),
-          FlatButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              setState(() => _barColor = previousColor);
-              Navigator.of(context).pop();
-            },
-          ),
-          FlatButton(
-            child: const Text('Set Color'),
-            onPressed: () async {
-              var hexColor =
-                  '#${(_barColor.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
-              var colorResponse = await UserService().updateColor(hexColor);
+              },
+            ),
+            TextButton(
+              child: const Text('Set Color'),
+              onPressed: () async {
+                var hexColor =
+                    '#${(_barColor.value & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
+                var colorResponse = await UserService().updateColor(hexColor);
 
-              if (colorResponse.statusCode == 204) {
-                StorageService().writeUserColor(_barColor);
-
-                var currentBrightness = DynamicTheme.of(context).brightness;
-                DynamicTheme.of(context).setThemeData(Common.getThemeData(
-                    brightness: currentBrightness, appBarColor: _barColor));
-
-                Navigator.of(context).pop();
-              } else {
-                Dialogs.showCustomDialog(context: context);
-              }
-            },
-          ),
-        ],
-      ),
+                if (colorResponse.statusCode == 204) {
+                  await StorageService().writeUserColor(_barColor);
+                  Navigator.pop(context);
+                } else {
+                  Dialogs.showCustomDialog(context: context);
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -305,7 +303,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: Text(
                       'User',
-                      style: TextStyle(color: Theme.of(context).accentColor),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary),
                     ),
                   ),
                 if (_isAuthenticated == AuthLocalStatus.not_authenticated)
@@ -334,23 +333,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: Text(
                     'Settings',
-                    style: TextStyle(color: Theme.of(context).accentColor),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.wb_sunny),
                   title: const Text('Dark mode'),
                   onTap: () {
-                    Brightness newBrightness;
+                    int newBrightness;
 
-                    if (DynamicTheme.of(context).brightness == Brightness.dark)
-                      newBrightness = Brightness.light;
+                    if (DynamicTheme.of(context).themeId == AppThemes.Dark)
+                      newBrightness = AppThemes.Light;
                     else
-                      newBrightness = Brightness.dark;
+                      newBrightness = AppThemes.Dark;
 
-                    DynamicTheme.of(context).setBrightness(newBrightness);
-                    DynamicTheme.of(context).setThemeData(Common.getThemeData(
-                        brightness: newBrightness, appBarColor: _barColor));
+                    DynamicTheme.of(context).setTheme(newBrightness);
                   },
                 ),
                 if (_isAuthenticated == AuthLocalStatus.authenticated)
@@ -391,7 +389,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: Text(
                     'Help',
-                    style: TextStyle(color: Theme.of(context).accentColor),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ),
                 ListTile(
@@ -414,14 +413,16 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text(
                         snapshot.hasData
                             ? "${snapshot.data.appName} for $_platform v${snapshot.data.version} (${snapshot.data.buildNumber})"
-                            : snapshot.hasError ? 'Error' : 'Loading...',
+                            : snapshot.hasError
+                                ? 'Error'
+                                : 'Loading...',
                         textAlign: TextAlign.center,
                       ),
                     );
                   },
                 ),
                 if (_isAuthenticated == AuthLocalStatus.authenticated)
-                  FlatButton(
+                  TextButton(
                     onPressed: () {
                       Dialogs.showCustomConfirmDialog(
                         title: 'Are you sure?',
@@ -440,7 +441,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 if (_isAuthenticated == AuthLocalStatus.authenticated)
-                  FlatButton(
+                  TextButton(
                     onPressed: () {
                       Dialogs.showCustomConfirmDialog(
                         title: 'Are you sure?',

@@ -8,10 +8,11 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:usesCleartextTraffic="true"
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="${applicationName}"
         android:label="Hepitrack"
         android:icon="@mipmap/launcher_icon">
         <activity
+            android:exported="true"
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
